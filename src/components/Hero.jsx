@@ -57,8 +57,13 @@ const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="flex justify-center"
+          className="flex flex-col items-center gap-8"
         >
+          <button
+            className="px-8 py-4 bg-redlamp-red hover:bg-redlamp-orange text-white font-bold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-redlamp-red/30"
+          >
+            Book a Session
+          </button>
           <a 
             href="#about"
             className="group flex flex-col items-center text-redlamp-light/60 hover:text-redlamp-red transition-colors duration-300"
