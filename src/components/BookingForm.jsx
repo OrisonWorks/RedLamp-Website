@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Calendar, Clock, Music, User, CheckCircle } from 'lucide-react'
+import CustomCalendar from './Calendar'
 
 const BookingForm = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const BookingForm = ({ isOpen, onClose }) => {
   })
 
   const [errors, setErrors] = useState({})
+  const [showCalendar, setShowCalendar] = useState(false)
 
   const validateDate = (date) => {
     const selectedDate = new Date(date)
@@ -162,27 +164,48 @@ I agree to the RedLamp terms and conditions.
             </div>
 
             {/* Date */}
-            <div>
+            <div className="relative">
               <label className="flex items-center gap-2 text-sm font-medium text-redlamp-light mb-2">
                 <Calendar className="w-4 h-4 text-redlamp-red" />
                 Date *
               </label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                min={new Date().toISOString().split('T')[0]}
-                className={`w-full px-4 py-3 bg-redlamp-darker border rounded-lg focus:outline-none focus:ring-2 focus:ring-redlamp-red/50 transition-all ${
-                  errors.date ? 'border-red-500' : 'border-redlamp-red/20'
-                } text-white`}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  onClick={() => setShowCalendar(!showCalendar)}
+                  readOnly
+                  placeholder="Select a date"
+                  className={`w-full px-4 py-3 bg-redlamp-darker border rounded-lg focus:outline-none focus:ring-2 focus:ring-redlamp-red/50 transition-all cursor-pointer ${
+                    errors.date ? 'border-red-500' : 'border-redlamp-red/20'
+                  } text-white placeholder-redlamp-light/40`}
+                />
+                <Calendar
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-redlamp-red pointer-events-none"
+                />
+              </div>
               {errors.date && (
                 <p className="text-red-500 text-sm mt-1">{errors.date}</p>
               )}
               <p className="text-redlamp-light/50 text-xs mt-1">
                 * Only available on Saturdays and Sundays
               </p>
+              <AnimatePresence>
+                {showCalendar && (
+                  <CustomCalendar
+                    selectedDate={formData.date}
+                    onSelect={(date) => {
+                      setFormData(prev => ({ ...prev, date }))
+                      if (errors.date) {
+                        setErrors(prev => ({ ...prev, date: '' }))
+                      }
+                    }}
+                    onClose={() => setShowCalendar(false)}
+                  />
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Time */}
