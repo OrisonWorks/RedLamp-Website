@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
 import BookingForm from './BookingForm'
+import { SITE_CONFIG } from '../config'
 
 const Hero = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-redlamp-darker via-redlamp-dark to-redlamp-darker" />
       
@@ -22,8 +23,8 @@ const Hero = () => {
           transition={{ duration: 0.8 }}
         >
           <img 
-            src="/RedLamp-Website/Redlamp proto logo.png" 
-            alt="REDLAMP Logo" 
+            src="/Redlamp proto logo.png" 
+            alt={`${SITE_CONFIG.name} Logo`} 
             className="w-48 h-48 mx-auto mb-8 object-contain mix-blend-screen"
           />
         </motion.div>
@@ -43,7 +44,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Creative Incubator • Digital Media Engine • Social Enterprise
+          {SITE_CONFIG.tagline}
         </motion.p>
         
         <motion.p 

@@ -1,11 +1,12 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import { SITE_CONFIG } from '../config'
 
 const Footer = () => {
   return (
     <footer className="py-12 px-6 bg-redlamp-darker border-t border-redlamp-red/10">
       <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
+        <div className="grid md:grid-cols-4 gap-8 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -16,7 +17,7 @@ const Footer = () => {
               <span className="text-redlamp-red">RED</span>LAMP
             </h3>
             <p className="text-redlamp-light/60 leading-relaxed">
-              A cultural movement, sonic sanctuary, and ethical creative engine proving that boundary-pushing alternative art can directly ignite sustainable community transformation.
+              {SITE_CONFIG.tagline}
             </p>
           </motion.div>
 
@@ -39,6 +40,11 @@ const Footer = () => {
                 </a>
               </li>
               <li>
+                <a href="#showcase" className="text-redlamp-light/60 hover:text-redlamp-red transition-colors duration-300">
+                  Showcase
+                </a>
+              </li>
+              <li>
                 <a href="#framework" className="text-redlamp-light/60 hover:text-redlamp-red transition-colors duration-300">
                   Wealth-Recycling Framework
                 </a>
@@ -52,11 +58,26 @@ const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
+            <h4 className="text-lg font-bold mb-4 text-redlamp-red">Contact</h4>
+            <ul className="space-y-2 text-redlamp-light/60">
+              <li>WhatsApp: +{SITE_CONFIG.contact.whatsapp}</li>
+              {SITE_CONFIG.contact.emails.map(email => (
+                <li key={email}>{email}</li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
             <h4 className="text-lg font-bold mb-4 text-redlamp-red">Part of</h4>
             <p className="text-redlamp-light/60 leading-relaxed">
               Chisomo NGO
             </p>
-            <p className="text-redlamp-light/60 leading-relaxed mt-2">
+            <p className="text-redlamp-light/60 leading-relaxed mt-2 text-sm">
               Empowering communities through creative education and youth welfare initiatives
             </p>
           </motion.div>

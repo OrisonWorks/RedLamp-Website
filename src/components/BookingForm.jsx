@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Calendar, Clock, Music, User, CheckCircle } from 'lucide-react'
+import { X, Calendar, Clock, Music, User, CheckCircle, ExternalLink, Mail, Phone } from 'lucide-react'
 import CustomCalendar from './Calendar'
+import { SITE_CONFIG } from '../config'
 
 const BookingForm = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -16,20 +17,20 @@ const BookingForm = ({ isOpen, onClose }) => {
   const [errors, setErrors] = useState({})
   const [showCalendar, setShowCalendar] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const validateDate = (dateString) => {
     if (!dateString) return false
     const [year, month, day] = dateString.split('-').map(Number)
     const selectedDate = new Date(year, month - 1, day)
     const dayOfWeek = selectedDate.getDay()
-    // 0 = Sunday, 6 = Saturday
-    return dayOfWeek === 0 || dayOfWeek === 6
+    return SITE_CONFIG.booking.availableDays.includes(dayOfWeek)
   }
 
   const validateTime = (time) => {
     if (!time) return false
     const [hours] = time.split(':').map(Number)
-    return hours >= 10 && hours <= 21
+    return hours >= SITE_CONFIG.booking.hours.start && hours <= SITE_CONFIG.booking.hours.end
   }
 
   const handleSubmit = (e) => {
@@ -46,13 +47,13 @@ const BookingForm = ({ isOpen, onClose }) => {
     if (!formData.date) {
       newErrors.date = 'Date is required'
     } else if (!validateDate(formData.date)) {
-      newErrors.date = 'Booking is only available on Saturdays and Sundays'
+      newErrors.date = `Booking is only available on ${SITE_CONFIG.booking.availableDays.includes(0) ? 'Sundays' : ''} ${SITE_CONFIG.booking.availableDays.includes(6) ? 'and Saturdays' : ''}`.trim()
     }
 
     if (!formData.time) {
       newErrors.time = 'Time is required'
     } else if (!validateTime(formData.time)) {
-      newErrors.time = 'Booking hours are between 10:00 and 21:00'
+      newErrors.time = `Booking hours are between ${SITE_CONFIG.booking.hours.start}:00 and ${SITE_CONFIG.booking.hours.end}:00`
     }
 
     if (!formData.genre.trim()) {
@@ -71,7 +72,7 @@ const BookingForm = ({ isOpen, onClose }) => {
 
     // Generate WhatsApp message
     const whatsappMessage = `
-*REDLAMP Studio Booking Request*
+*${SITE_CONFIG.name} Studio Booking Request*
 
 *Artist Name:* ${formData.artistName}
 *Date:* ${formData.date}
@@ -79,15 +80,15 @@ const BookingForm = ({ isOpen, onClose }) => {
 *Genre:* ${formData.genre}
 *Producer Session:* ${formData.producerSession ? 'Yes (Paid)' : 'No'}
 
-*I agree to the RedLamp terms and conditions.*
+*I agree to the ${SITE_CONFIG.name} terms and conditions.*
     `.trim()
 
-    const whatsappUrl = `https://wa.me/260977745567?text=${encodeURIComponent(whatsappMessage)}`
+    const whatsappUrl = `https://wa.me/${SITE_CONFIG.contact.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`
 
     // Generate email
-    const emailSubject = 'REDLAMP Studio Booking Request'
+    const emailSubject = `${SITE_CONFIG.name} Studio Booking Request`
     const emailBody = `
-REDLAMP Studio Booking Request
+${SITE_CONFIG.name} Studio Booking Request
 
 Artist Name: ${formData.artistName}
 Date: ${formData.date}
@@ -95,14 +96,13 @@ Time: ${formData.time}
 Genre: ${formData.genre}
 Producer Session: ${formData.producerSession ? 'Yes (Paid)' : 'No'}
 
-I agree to the RedLamp terms and conditions.
+I agree to the ${SITE_CONFIG.name} terms and conditions.
     `.trim()
 
-    const mailtoUrl = `mailto:mellorison@gmail.com,mrchilunjikamoses@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
+    const mailtoUrl = `mailto:${SITE_CONFIG.contact.emails.join(',')}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
 
-    // Open WhatsApp and email immediately
+    // Open WhatsApp and email
     try {
-      // Use a small delay for the second navigation to avoid browser blocking both
       window.open(whatsappUrl, '_blank')
       setTimeout(() => {
         window.location.href = mailtoUrl
@@ -111,20 +111,21 @@ I agree to the RedLamp terms and conditions.
       console.error('Failed to open links:', err)
     }
 
-    // Reset state and close after a delay to ensure navigations are handled
-    setTimeout(() => {
-      setIsSubmitting(false)
-      onClose()
-      // Reset form
-      setFormData({
-        artistName: '',
-        date: '',
-        time: '',
-        genre: '',
-        producerSession: false,
-        agreedToTerms: false
-      })
-    }, 1000)
+    setIsSubmitting(false)
+    setIsSuccess(true)
+  }
+
+  const handleReset = () => {
+    setIsSuccess(false)
+    setFormData({
+      artistName: '',
+      date: '',
+      time: '',
+      genre: '',
+      producerSession: false,
+      agreedToTerms: false
+    })
+    onClose()
   }
 
   const handleChange = (e) => {
@@ -142,6 +143,7 @@ I agree to the RedLamp terms and conditions.
   useEffect(() => {
     if (isOpen) {
       setIsSubmitting(false)
+      setIsSuccess(false)
       setErrors({})
     }
   }, [isOpen])
@@ -175,6 +177,47 @@ I agree to the RedLamp terms and conditions.
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {isSuccess ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-8"
+              >
+                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-12 h-12 text-green-500" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">Request Sent!</h3>
+                <p className="text-redlamp-light/70 mb-8">
+                  Your booking details have been prepared for WhatsApp and Email. 
+                  Please ensure you send the messages in the opened windows.
+                </p>
+                
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center gap-3 p-4 bg-redlamp-darker rounded-lg border border-redlamp-red/10 text-left">
+                    <Phone className="w-5 h-5 text-redlamp-red flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-redlamp-light/50">WhatsApp</p>
+                      <p className="text-sm font-medium">+{SITE_CONFIG.contact.whatsapp}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-redlamp-darker rounded-lg border border-redlamp-red/10 text-left">
+                    <Mail className="w-5 h-5 text-redlamp-red flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-redlamp-light/50">Email</p>
+                      <p className="text-sm font-medium">{SITE_CONFIG.contact.emails[0]}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleReset}
+                  className="w-full py-4 bg-redlamp-red hover:bg-redlamp-orange text-white font-bold rounded-lg transition-all"
+                >
+                  Return to Site
+                </button>
+              </motion.div>
+            ) : (
+              <>
             {/* Artist Name */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-redlamp-light mb-2">
@@ -252,8 +295,8 @@ I agree to the RedLamp terms and conditions.
                 name="time"
                 value={formData.time}
                 onChange={handleChange}
-                min="10:00"
-                max="21:00"
+                min={`${SITE_CONFIG.booking.hours.start}:00`}
+                max={`${SITE_CONFIG.booking.hours.end}:00`}
                 className={`w-full px-4 py-3 bg-redlamp-darker border rounded-lg focus:outline-none focus:ring-2 focus:ring-redlamp-red/50 transition-all ${
                   errors.time ? 'border-red-500' : 'border-redlamp-red/20'
                 } text-white`}
@@ -262,7 +305,7 @@ I agree to the RedLamp terms and conditions.
                 <p className="text-red-500 text-sm mt-1">{errors.time}</p>
               )}
               <p className="text-redlamp-light/50 text-xs mt-1">
-                * Booking hours: 10:00 - 21:00
+                * Booking hours: {SITE_CONFIG.booking.hours.start}:00 - {SITE_CONFIG.booking.hours.end}:00
               </p>
             </div>
 
@@ -385,6 +428,8 @@ I agree to the RedLamp terms and conditions.
             <p className="text-center text-redlamp-light/50 text-xs">
               This will open WhatsApp and email with your booking details
             </p>
+              </>
+            )}
           </form>
           </motion.div>
         </motion.div>
