@@ -256,18 +256,23 @@ I agree to the RedLamp terms and conditions.
 
             {/* Producer Session */}
             <div className="flex items-start gap-3 p-4 bg-redlamp-darker rounded-lg border border-redlamp-red/10">
-              <input
-                type="checkbox"
-                name="producerSession"
-                id="producerSession"
-                checked={formData.producerSession}
-                onChange={handleChange}
-                className="mt-1 w-5 h-5 rounded border-redlamp-red/20 bg-redlamp-dark text-redlamp-red focus:ring-redlamp-red/50"
-              />
+              <div 
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, producerSession: !prev.producerSession }))
+                }}
+                className="mt-1 w-6 h-6 rounded border-2 border-redlamp-red/30 bg-redlamp-dark flex items-center justify-center cursor-pointer hover:border-redlamp-red transition-colors"
+              >
+                {formData.producerSession && (
+                  <div className="w-4 h-4 bg-redlamp-red rounded-sm" />
+                )}
+              </div>
               <div>
                 <label
                   htmlFor="producerSession"
-                  className="text-sm font-medium text-redlamp-light cursor-pointer"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, producerSession: !prev.producerSession }))
+                  }}
+                  className="text-sm font-medium text-redlamp-light cursor-pointer select-none"
                 >
                   Book Producer Session
                 </label>
@@ -291,17 +296,28 @@ I agree to the RedLamp terms and conditions.
                 <p>• Artists grant RedLamp non-exclusive rights to use recorded material</p>
               </div>
               <div className="flex items-start gap-3 mt-4">
-                <input
-                  type="checkbox"
-                  name="agreedToTerms"
-                  id="agreedToTerms"
-                  checked={formData.agreedToTerms}
-                  onChange={handleChange}
-                  className="mt-1 w-5 h-5 rounded border-redlamp-red/20 bg-redlamp-dark text-redlamp-red focus:ring-redlamp-red/50"
-                />
+                <div 
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, agreedToTerms: !prev.agreedToTerms }))
+                    if (errors.agreedToTerms) {
+                      setErrors(prev => ({ ...prev, agreedToTerms: '' }))
+                    }
+                  }}
+                  className="mt-1 w-6 h-6 rounded border-2 border-redlamp-red/30 bg-redlamp-dark flex items-center justify-center cursor-pointer hover:border-redlamp-red transition-colors"
+                >
+                  {formData.agreedToTerms && (
+                    <div className="w-4 h-4 bg-redlamp-red rounded-sm" />
+                  )}
+                </div>
                 <label
                   htmlFor="agreedToTerms"
-                  className="text-sm text-redlamp-light cursor-pointer"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, agreedToTerms: !prev.agreedToTerms }))
+                    if (errors.agreedToTerms) {
+                      setErrors(prev => ({ ...prev, agreedToTerms: '' }))
+                    }
+                  }}
+                  className="text-sm text-redlamp-light cursor-pointer select-none"
                 >
                   I agree to the terms and conditions *
                 </label>
