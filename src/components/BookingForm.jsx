@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Calendar, Clock, Music, User, CheckCircle } from 'lucide-react'
 import CustomCalendar from './Calendar'
@@ -15,12 +15,15 @@ const BookingForm = ({ isOpen, onClose }) => {
 
   const [errors, setErrors] = useState({})
   const [showCalendar, setShowCalendar] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const validateDate = (date) => {
-    const selectedDate = new Date(date)
-    const day = selectedDate.getDay()
+  const validateDate = (dateString) => {
+    if (!dateString) return false
+    const [year, month, day] = dateString.split('-').map(Number)
+    const selectedDate = new Date(year, month - 1, day)
+    const dayOfWeek = selectedDate.getDay()
     // 0 = Sunday, 6 = Saturday
-    return day === 0 || day === 6
+    return dayOfWeek === 0 || dayOfWeek === 6
   }
 
   const validateTime = (time) => {
@@ -31,6 +34,9 @@ const BookingForm = ({ isOpen, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
     const newErrors = {}
 
     if (!formData.artistName.trim()) {
@@ -59,6 +65,7 @@ const BookingForm = ({ isOpen, onClose }) => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      setIsSubmitting(false)
       return
     }
 
@@ -93,11 +100,31 @@ I agree to the RedLamp terms and conditions.
 
     const mailtoUrl = `mailto:mellorison@gmail.com,mrchilunjikamoses@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
 
-    // Open both
-    window.open(whatsappUrl, '_blank')
-    window.location.href = mailtoUrl
+    // Open WhatsApp and email immediately
+    try {
+      // Use a small delay for the second navigation to avoid browser blocking both
+      window.open(whatsappUrl, '_blank')
+      setTimeout(() => {
+        window.location.href = mailtoUrl
+      }, 200)
+    } catch (err) {
+      console.error('Failed to open links:', err)
+    }
 
-    onClose()
+    // Reset state and close after a delay to ensure navigations are handled
+    setTimeout(() => {
+      setIsSubmitting(false)
+      onClose()
+      // Reset form
+      setFormData({
+        artistName: '',
+        date: '',
+        time: '',
+        genre: '',
+        producerSession: false,
+        agreedToTerms: false
+      })
+    }, 1000)
   }
 
   const handleChange = (e) => {
@@ -112,25 +139,31 @@ I agree to the RedLamp terms and conditions.
     }
   }
 
-  if (!isOpen) return null
+  useEffect(() => {
+    if (isOpen) {
+      setIsSubmitting(false)
+      setErrors({})
+    }
+  }, [isOpen])
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        onClick={onClose}
-      >
+      {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ duration: 0.3 }}
-          className="bg-redlamp-dark border border-redlamp-red/20 rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
-          onClick={(e) => e.stopPropagation()}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={onClose}
         >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className="bg-redlamp-dark border border-redlamp-red/20 rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-bold text-redlamp-red">Book a Session</h2>
             <button
@@ -327,21 +360,35 @@ I agree to the RedLamp terms and conditions.
               )}
             </div>
 
+            {/* Error Summary */}
+            {Object.keys(errors).length > 0 && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <p className="text-red-400 text-sm font-medium mb-1">Please fix the following:</p>
+                {errors.artistName && <p className="text-red-400 text-xs">• {errors.artistName}</p>}
+                {errors.date && <p className="text-red-400 text-xs">• {errors.date}</p>}
+                {errors.time && <p className="text-red-400 text-xs">• {errors.time}</p>}
+                {errors.genre && <p className="text-red-400 text-xs">• {errors.genre}</p>}
+                {errors.agreedToTerms && <p className="text-red-400 text-xs">• {errors.agreedToTerms}</p>}
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-4 bg-redlamp-red hover:bg-redlamp-orange text-white font-bold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-redlamp-red/30 flex items-center justify-center gap-2"
+              disabled={isSubmitting}
+              className="w-full py-4 bg-redlamp-red hover:bg-redlamp-orange text-white font-bold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-redlamp-red/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <CheckCircle className="w-5 h-5" />
-              Submit Booking Request
+              {isSubmitting ? 'Submitting...' : 'Submit Booking Request'}
             </button>
 
             <p className="text-center text-redlamp-light/50 text-xs">
               This will open WhatsApp and email with your booking details
             </p>
           </form>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      )}
     </AnimatePresence>
   )
 }

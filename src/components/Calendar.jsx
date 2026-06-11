@@ -24,9 +24,16 @@ const Calendar = ({ selectedDate, onSelect, onClose }) => {
     return date < today
   }
 
+  const formatDate = (date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   const handleDateClick = (date) => {
     if (isWeekend(date) && !isPastDate(date)) {
-      onSelect(date.toISOString().split('T')[0])
+      onSelect(formatDate(date))
       onClose()
     }
   }
@@ -71,7 +78,7 @@ const Calendar = ({ selectedDate, onSelect, onClose }) => {
       const date = new Date(year, month, day)
       const isWeekendDay = isWeekend(date)
       const isPast = isPastDate(date)
-      const isSelected = selectedDate === date.toISOString().split('T')[0]
+      const isSelected = selectedDate === formatDate(date)
       const isDisabled = !isWeekendDay || isPast
 
       days.push(
