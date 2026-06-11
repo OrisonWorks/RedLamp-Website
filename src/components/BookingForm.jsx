@@ -91,7 +91,7 @@ Producer Session: ${formData.producerSession ? 'Yes (Paid)' : 'No'}
 I agree to the RedLamp terms and conditions.
     `.trim()
 
-    const mailtoUrl = `mailto:mellorison@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
+    const mailtoUrl = `mailto:mellorison@gmail.com,mrchilunjikamoses@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
 
     // Open both
     window.open(whatsappUrl, '_blank')
