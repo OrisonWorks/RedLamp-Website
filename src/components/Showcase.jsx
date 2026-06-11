@@ -8,19 +8,19 @@ const Showcase = () => {
     {
       title: 'Alternative Rock Session',
       artist: 'The Indie Collective',
-      thumbnail: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=800&auto=format&fit=crop',
+      thumbnail: 'https://images.unsplash.com/photo-1514525253344-f814d0743b1a?auto=format&fit=crop&q=80&w=800',
       duration: '12:45'
     },
     {
       title: 'Progressive Soul Experience',
       artist: 'Lumina Echo',
-      thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop',
+      thumbnail: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=800',
       duration: '15:20'
     },
     {
       title: 'Experimental Electronic Live',
       artist: 'Synth Wave Ritual',
-      thumbnail: 'https://images.unsplash.com/photo-1459749411177-042180ce673c?q=80&w=800&auto=format&fit=crop',
+      thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800',
       duration: '10:30'
     }
   ]
@@ -54,11 +54,11 @@ const Showcase = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group relative rounded-xl overflow-hidden cursor-pointer shadow-2xl shadow-black/50 bg-redlamp-gray"
             >
-              <img 
-                src={session.thumbnail} 
-                alt={session.title}
-                loading="lazy"
-                className="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-100 bg-redlamp-dark"
+              <div 
+                className="w-full aspect-video bg-cover bg-center transition-transform duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-100 bg-redlamp-dark"
+                style={{ backgroundImage: `url(${session.thumbnail})` }}
+                role="img"
+                aria-label={session.title}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-redlamp-dark via-transparent to-transparent" />
               
