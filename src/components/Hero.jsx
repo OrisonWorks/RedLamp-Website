@@ -23,7 +23,7 @@ const Hero = () => {
           transition={{ duration: 0.8 }}
         >
           <img 
-            src="/Redlamp proto logo.png" 
+            src={`${import.meta.env.BASE_URL}redlamp-logo.png`} 
             alt={`${SITE_CONFIG.name} Logo`} 
             className="w-48 h-48 mx-auto mb-8 object-contain mix-blend-screen"
           />
