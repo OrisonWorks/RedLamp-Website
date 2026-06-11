@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
+import BookingForm from './BookingForm'
 
 const Hero = () => {
+  const [isBookingOpen, setIsBookingOpen] = useState(false)
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background gradient */}
@@ -60,6 +62,7 @@ const Hero = () => {
           className="flex flex-col items-center gap-8"
         >
           <button
+            onClick={() => setIsBookingOpen(true)}
             className="px-8 py-4 bg-redlamp-red hover:bg-redlamp-orange text-white font-bold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-redlamp-red/30"
           >
             Book a Session
@@ -73,6 +76,8 @@ const Hero = () => {
           </a>
         </motion.div>
       </div>
+      
+      <BookingForm isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
     </section>
   )
 }
